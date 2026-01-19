@@ -76,7 +76,12 @@ function startWebSocketServer() {
 
         // Serve static files (client library)
         // Access via: http://localhost:3100/ml-bridge.js
-        expressApp.use(express.static(path.join(__dirname, '../public')));
+        // Use app.getAppPath() for production compatibility
+        const publicPath = isDev
+            ? path.join(__dirname, '../public')
+            : path.join(process.resourcesPath, 'app.asar.unpacked/public');
+
+        expressApp.use(express.static(publicPath));
 
         // CORS
         expressApp.use((req, res, next) => {
