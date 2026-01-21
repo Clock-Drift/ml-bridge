@@ -19,7 +19,7 @@ function App() {
     const [activeTab, setActiveTab] = useState('hub');
     const [isProMode, setIsProMode] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [inputSource, setInputSource] = useState('serial'); // 'serial' | 'webcam' | 'osc'
+    const [inputSource, setInputSource] = useState('webcam'); // 'serial' | 'webcam' | 'osc'
     const [showSourceChangeModal, setShowSourceChangeModal] = useState(false);
     const [pendingSource, setPendingSource] = useState(null);
     const [connectionStatus, setConnectionStatus] = useState({ connected: false, source: 'None' });
