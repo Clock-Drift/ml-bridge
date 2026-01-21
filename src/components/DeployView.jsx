@@ -9,6 +9,7 @@ export function DeployView({
     isModelTraining, onExportArduino,
     protocol, setProtocol, // Lifted state from App.jsx
     targetDeviceId, setTargetDeviceId, // Lifted state from App.jsx
+    serialFormat, setSerialFormat, // Lifted state from App.jsx
     onExportWeb
 }) {
     // const [protocol, setProtocol] = useState('osc'); // REMOVED - now props
@@ -164,6 +165,26 @@ export function DeployView({
                                             </div>
                                             <div className="text-[9px] text-zinc-600 mt-1 pl-1">
                                                 * Required to route messages via Serial Bridge.
+                                            </div>
+
+                                            {/* Format Selector */}
+                                            <div className="flex items-center gap-2 mt-3 pl-1">
+                                                <div className="text-[9px] text-zinc-500 font-bold tracking-wider">FORMAT:</div>
+                                                <div className="flex bg-[#050505] border border-zinc-800 rounded overflow-hidden">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setSerialFormat('json'); }}
+                                                        className={`px-3 py-1 text-[10px] font-bold transition-colors ${serialFormat === 'json' ? 'bg-emerald-500/20 text-emerald-400' : 'text-zinc-600 hover:text-zinc-400 hover:bg-[#111]'}`}
+                                                    >
+                                                        JSON
+                                                    </button>
+                                                    <div className="w-px bg-zinc-800"></div>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setSerialFormat('csv'); }}
+                                                        className={`px-3 py-1 text-[10px] font-bold transition-colors ${serialFormat === 'csv' ? 'bg-emerald-500/20 text-emerald-400' : 'text-zinc-600 hover:text-zinc-400 hover:bg-[#111]'}`}
+                                                    >
+                                                        CSV
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     )}

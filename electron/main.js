@@ -158,23 +158,33 @@ async function sendToSerialBridge(deviceId, predictionData) {
     if (predictionData.label === lastSentLabel) {
         return; // Skip - same prediction as last time
     }
-    
+
     // Also apply time-based throttle as backup
     const now = Date.now();
     if (now - lastSerialSendTime < SERIAL_SEND_THROTTLE_MS) {
         return; // Skip - sent too recently
     }
-    
+
     lastSentLabel = predictionData.label;
     lastSerialSendTime = now;
-    
+
     try {
-        // Format data as JSON string (what Arduino expects)
-        const message = JSON.stringify({
-            // Simplified payload - only send label to reduce serial buffer load
-            label: predictionData.label,
-            confidence: predictionData.confidence || Math.max(...Object.values(predictionData.confidences || {}))
-        });
+        let message;
+
+        // Format based on selected format (JSON or CSV)
+        if (predictionData.serialFormat === 'csv') {
+            // CSV Format: label,confidence
+            // Example: class_1,0.85
+            const confidence = predictionData.confidence || Math.max(...Object.values(predictionData.confidences || {}));
+            message = `${predictionData.label},${confidence.toFixed(2)}`;
+        } else {
+            // JSON Format (Default)
+            // Example: {"label":"class_1","confidence":0.85}
+            message = JSON.stringify({
+                label: predictionData.label,
+                confidence: predictionData.confidence || Math.max(...Object.values(predictionData.confidences || {}))
+            });
+        }
 
         console.log(`[Serial Bridge] Sending to ${deviceId} via HTTP:`, message.substring(0, 100));
 

@@ -81,15 +81,22 @@ function App() {
     // Refs for protocol and deviceId to avoid stale closures in prediction callbacks
     const protocolRef = useRef(protocol);
     const targetDeviceIdRef = useRef(targetDeviceId);
-    
+
     // Sync refs with state
     useEffect(() => {
         protocolRef.current = protocol;
     }, [protocol]);
-    
+
     useEffect(() => {
         targetDeviceIdRef.current = targetDeviceId;
     }, [targetDeviceId]);
+
+    const [serialFormat, setSerialFormat] = useState('json'); // 'json' | 'csv'
+    const serialFormatRef = useRef(serialFormat);
+
+    useEffect(() => {
+        serialFormatRef.current = serialFormat;
+    }, [serialFormat]);
 
 
     // Connect/disconnect Serial Bridge based on protocol selection
@@ -310,7 +317,8 @@ function App() {
                                 window.api.ws.broadcast('prediction', {
                                     ...result,
                                     protocol: protocolRef.current,
-                                    deviceId: protocolRef.current === 'serial' ? targetDeviceIdRef.current : null
+                                    deviceId: protocolRef.current === 'serial' ? targetDeviceIdRef.current : null,
+                                    serialFormat: protocolRef.current === 'serial' ? serialFormatRef.current : null
                                 });
                             }
                         }
@@ -877,6 +885,8 @@ function App() {
                 setProtocol={setProtocol}
                 targetDeviceId={targetDeviceId}
                 setTargetDeviceId={setTargetDeviceId}
+                serialFormat={serialFormat}
+                setSerialFormat={setSerialFormat}
             />
 
             {/* Source Change Confirmation Modal */}

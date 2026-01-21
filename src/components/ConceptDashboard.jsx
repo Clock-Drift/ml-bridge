@@ -710,6 +710,8 @@ export function ConceptDashboard({
                                 setProtocol={setProtocol}
                                 targetDeviceId={targetDeviceId}
                                 setTargetDeviceId={setTargetDeviceId}
+                                serialFormat={serialFormat}
+                                setSerialFormat={setSerialFormat}
                             />
                         )}
 
