@@ -419,7 +419,8 @@ export function ConceptDashboard({
     onExportWeb,
     dataRefreshKey,
     protocol, setProtocol,
-    targetDeviceId, setTargetDeviceId
+    targetDeviceId, setTargetDeviceId,
+    serialFormat, setSerialFormat
 }) {
     // Internal dashboard state (View switching)
     const [activeView, setActiveView] = useState('training'); // 'data' | 'training' | 'models' | 'deploy'
