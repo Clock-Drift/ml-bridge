@@ -151,13 +151,21 @@ const fetch = require('electron-fetch').default;
 
 // Throttle Serial Bridge sends to prevent flooding Arduino
 let lastSerialSendTime = 0;
-const SERIAL_SEND_THROTTLE_MS = 500; // Send at most once per 100ms
+let lastSentLabel = null; // Track last sent label for change detection
+const SERIAL_SEND_THROTTLE_MS = 500; // Send at most once per 500ms
 async function sendToSerialBridge(deviceId, predictionData) {
-    // Throttle: skip if we sent too recently
+    // Only send if label changed (smart throttling)
+    if (predictionData.label === lastSentLabel) {
+        return; // Skip - same prediction as last time
+    }
+    
+    // Also apply time-based throttle as backup
     const now = Date.now();
     if (now - lastSerialSendTime < SERIAL_SEND_THROTTLE_MS) {
-        return; // Skip this send
+        return; // Skip - sent too recently
     }
+    
+    lastSentLabel = predictionData.label;
     lastSerialSendTime = now;
     
     try {
