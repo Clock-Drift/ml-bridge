@@ -75,6 +75,10 @@ function App() {
     const [selectedFeatures, setSelectedFeatures] = useState(new Set());
     const [dataRefreshKey, setDataRefreshKey] = useState(0); // Trigger for DataView refresh
 
+    // Deploy/Output Protocol Configuration
+    const [protocol, setProtocol] = useState('osc'); // 'osc' | 'ws' | 'serial'
+    const [targetDeviceId, setTargetDeviceId] = useState(''); // For Serial Bridge routing
+
 
     const handleSelectInputSource = (source) => {
         // Don't confirm if switching to the same source
@@ -274,7 +278,11 @@ function App() {
                             }
                             // Broadcast via WebSocket
                             if (window.api && window.api.ws) {
-                                window.api.ws.broadcast('prediction', result);
+                                window.api.ws.broadcast('prediction', {
+                                    ...result,
+                                    protocol: protocol,
+                                    deviceId: protocol === 'serial' ? targetDeviceId : null
+                                });
                             }
                         }
                     });
@@ -369,7 +377,11 @@ function App() {
                             window.api.osc.send('127.0.0.1', 12000, '/ml/classification', [result.label, clsName]);
                         }
                         if (window.api && window.api.ws) {
-                            window.api.ws.broadcast('prediction', result);
+                            window.api.ws.broadcast('prediction', {
+                                ...result,
+                                protocol: protocol,
+                                deviceId: protocol === 'serial' ? targetDeviceId : null
+                            });
                         }
                     }
                 } else {
@@ -386,7 +398,11 @@ function App() {
                                 window.api.osc.send('127.0.0.1', 12000, '/ml/classification', [result.label, clsName]);
                             }
                             if (window.api && window.api.ws) {
-                                window.api.ws.broadcast('prediction', result);
+                                window.api.ws.broadcast('prediction', {
+                                    ...result,
+                                    protocol: protocol,
+                                    deviceId: protocol === 'serial' ? targetDeviceId : null
+                                });
                             }
                         }
                     }
@@ -407,7 +423,11 @@ function App() {
                             });
                         }
                         if (window.api && window.api.ws) {
-                            window.api.ws.broadcast('prediction', result);
+                            window.api.ws.broadcast('prediction', {
+                                ...result,
+                                protocol: protocol,
+                                deviceId: protocol === 'serial' ? targetDeviceId : null
+                            });
                         }
 
                     } else {
@@ -824,6 +844,10 @@ function App() {
                 onSave={handleSaveData}
                 onLoad={handleLoadData}
                 dataRefreshKey={dataRefreshKey}
+                protocol={protocol}
+                setProtocol={setProtocol}
+                targetDeviceId={targetDeviceId}
+                setTargetDeviceId={setTargetDeviceId}
             />
 
             {/* Source Change Confirmation Modal */}

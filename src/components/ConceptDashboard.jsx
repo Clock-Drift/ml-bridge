@@ -417,12 +417,14 @@ export function ConceptDashboard({
     recordingClassId,
     setRecordingClassId,
     onExportWeb,
-    dataRefreshKey
+    dataRefreshKey,
+    protocol, setProtocol,
+    targetDeviceId, setTargetDeviceId
 }) {
     // Internal dashboard state (View switching)
     const [activeView, setActiveView] = useState('training'); // 'data' | 'training' | 'models' | 'deploy'
     const [showAdvancedTraining, setShowAdvancedTraining] = useState(false); // New: Collapse advanced settings
-    const [outputProtocol, setOutputProtocol] = useState('osc'); // 'osc' | 'ws' | 'serial'
+    // outputProtocol removed - now managed in App.jsx and passed as props
 
     // Auto-switch to monitor when running - NOW switch to DEPLOY tab (Monitor moved there)
     useEffect(() => {
@@ -704,9 +706,10 @@ export function ConceptDashboard({
                                 onClearError={() => { }}
                                 onUpload={onUpload}
                                 inputSource={inputSource}
-                                protocol={outputProtocol}
-                                setProtocol={setOutputProtocol}
-
+                                protocol={protocol}
+                                setProtocol={setProtocol}
+                                targetDeviceId={targetDeviceId}
+                                setTargetDeviceId={setTargetDeviceId}
                             />
                         )}
 
@@ -1078,27 +1081,27 @@ export function ConceptDashboard({
                             <div className="flex justify-between items-center text-xs text-zinc-400">
                                 <span>Protocol</span>
                                 <span className="font-mono text-white">
-                                    {outputProtocol === 'osc' ? 'OSC (UDP)' :
-                                        outputProtocol === 'ws' ? 'WEBSOCKET' : 'SERIAL'}
+                                    {protocol === 'osc' ? 'OSC (UDP)' :
+                                        protocol === 'ws' ? 'WEBSOCKET' : 'SERIAL'}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-xs text-zinc-400">
                                 <span>Target</span>
                                 <span className="font-mono text-white">
-                                    {outputProtocol === 'osc' ? '127.0.0.1' :
-                                        outputProtocol === 'ws' ? 'localhost' : 'Device ID'}
+                                    {protocol === 'osc' ? '127.0.0.1' :
+                                        protocol === 'ws' ? 'localhost' : 'Device ID'}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-xs text-zinc-400">
                                 <span>Port/Dest</span>
                                 <span className="font-mono text-white">
-                                    {outputProtocol === 'osc' ? '12000' :
-                                        outputProtocol === 'ws' ? '3100' : 'USB'}
+                                    {protocol === 'osc' ? '12000' :
+                                        protocol === 'ws' ? '3100' : 'USB'}
                                 </span>
                             </div>
                             <div className="mt-2 text-[10px] font-mono text-zinc-600">
-                                {outputProtocol === 'osc' ? '/ml/classification' :
-                                    outputProtocol === 'ws' ? 'Event: "prediction"' : 'Serial JSON'}
+                                {protocol === 'osc' ? '/ml/classification' :
+                                    protocol === 'ws' ? 'Event: "prediction"' : 'Serial JSON'}
                             </div>
                         </div>
                     </div>

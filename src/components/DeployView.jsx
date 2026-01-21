@@ -7,12 +7,13 @@ export function DeployView({
     isRunning, onToggleRun,
     engineType, trainingMode, outputs,
     isModelTraining, onExportArduino,
-    protocol, setProtocol, // Lifted state
+    protocol, setProtocol, // Lifted state from App.jsx
+    targetDeviceId, setTargetDeviceId, // Lifted state from App.jsx
     onExportWeb
 }) {
-    // const [protocol, setProtocol] = useState('osc'); // Lifted to Parent
+    // const [protocol, setProtocol] = useState('osc'); // REMOVED - now props
     const [wsStatus, setWsStatus] = useState('disconnected');
-    const [targetDeviceId, setTargetDeviceId] = useState('');
+    // const [targetDeviceId, setTargetDeviceId] = useState(''); // REMOVED - now props
     const [logs, setLogs] = useState(['[SYSTEM] Bridge Ready.']);
 
     const protocols = [
