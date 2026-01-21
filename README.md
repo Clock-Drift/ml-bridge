@@ -203,6 +203,19 @@ ML Bridge broadcasts results to `127.0.0.1:12000` (configurable).
 *   **Args**: `[OutputID (string), Value (float)]`
 *   **Example**: `/ml/regression` `["out_1", 0.75]`
 
+### Serial Bridge (Arduino)
+
+Send predictions directly to Arduino or other microcontrollers via Serial Bridge.
+
+1. Go to **Deploy** tab
+2. Select **Serial Bridge**
+3. Enter your device ID (e.g., `arduino_1`)
+4. Choose data format: **JSON** or **CSV**
+
+**📖 [Complete Arduino Integration Guide](docs/ARDUINO_INTEGRATION.md)**
+
+Includes step-by-step setup, code examples for both formats, LED control, servo motors, and troubleshooting tips.
+
 ### WebSocket Output
 
 ML Bridge runs a WebSocket server on `ws://localhost:3100`. It serves a helper library to make connection easy.
