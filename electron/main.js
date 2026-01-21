@@ -123,15 +123,81 @@ function startWebSocketServer() {
 // IPC Handler to broadcast
 ipcMain.handle('ws-broadcast', (event, channel, data) => {
     try {
+        // Broadcast via ML Bridge's own WebSocket server
         if (io) {
             io.emit(channel, data);
-            return { success: true };
         }
-        return { success: false, error: 'Server not running' };
+
+        // If protocol is 'serial' and deviceId is provided, send to Serial Bridge
+        if (data.protocol === 'serial' && data.deviceId) {
+            sendToSerialBridge(data.deviceId, data);
+        }
+
+        return { success: true };
     } catch (e) {
         return { success: false, error: e.message };
     }
 });
+
+// Serial Bridge Client Connection
+const socketIOClient = require('socket.io-client');
+let serialBridgeSocket = null;
+
+function connectToSerialBridge() {
+    if (serialBridgeSocket && serialBridgeSocket.connected) {
+        return;
+    }
+
+    try {
+        serialBridgeSocket = socketIOClient('http://localhost:3000', {
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 5
+        });
+
+        serialBridgeSocket.on('connect', () => {
+            console.log('[Serial Bridge] Connected to Serial Bridge server');
+        });
+
+        serialBridgeSocket.on('disconnect', () => {
+            console.log('[Serial Bridge] Disconnected from Serial Bridge server');
+        });
+
+        serialBridgeSocket.on('connect_error', (error) => {
+            console.log('[Serial Bridge] Connection error:', error.message);
+        });
+    } catch (e) {
+        console.error('[Serial Bridge] Failed to connect:', e);
+    }
+}
+
+function sendToSerialBridge(deviceId, predictionData) {
+    if (!serialBridgeSocket || !serialBridgeSocket.connected) {
+        console.log('[Serial Bridge] Not connected, attempting to connect...');
+        connectToSerialBridge();
+        return;
+    }
+
+    try {
+        // Format data as JSON string (what Arduino expects)
+        const message = JSON.stringify({
+            label: predictionData.label,
+            confidence: predictionData.confidence || Math.max(...Object.values(predictionData.confidences || {})),
+            confidences: predictionData.confidences
+        });
+
+        // Serial Bridge expects: socket.emit('serial-send', { deviceId, data })
+        // This matches the pattern used by the client library's send() method
+        serialBridgeSocket.emit('serial-send', {
+            arduinoId: deviceId,  // Serial Bridge uses 'arduinoId' in its API
+            data: message
+        });
+
+        console.log(`[Serial Bridge] Sent to ${deviceId}:`, message.substring(0, 100));
+    } catch (e) {
+        console.error('[Serial Bridge] Send error:', e);
+    }
+}
 
 // Universal Input Hub Placeholder
 ipcMain.handle('get-app-version', () => app.getVersion());
