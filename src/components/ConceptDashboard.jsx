@@ -604,7 +604,7 @@ export function ConceptDashboard({
                                                     <span className="text-[9px] text-zinc-600 font-mono">{embeddingEntries.length} features</span>
                                                 </button>
                                                 {showEmbeddings && (
-                                                    <div className="mt-1 space-y-1 pl-4 border-l border-zinc-800">
+                                                    <div className="mt-1 space-y-1 pl-4 pb-4 border-l border-zinc-800">
                                                         {embeddingEntries.map(([key, val]) => {
                                                             const index = keys.indexOf(key);
                                                             const isActive = selectedFeatures?.has(key);
