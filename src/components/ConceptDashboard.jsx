@@ -424,6 +424,7 @@ export function ConceptDashboard({
     // Internal dashboard state (View switching)
     const [activeView, setActiveView] = useState('training'); // 'data' | 'training' | 'models' | 'deploy'
     const [showAdvancedTraining, setShowAdvancedTraining] = useState(false); // New: Collapse advanced settings
+    const [showEmbeddings, setShowEmbeddings] = useState(false); // Collapsible embeddings section
     // outputProtocol removed - now managed in App.jsx and passed as props
 
     // Auto-switch to monitor when running - NOW switch to DEPLOY tab (Monitor moved there)
@@ -556,31 +557,75 @@ export function ConceptDashboard({
                                 // Technical palette (matching Visualizer.jsx)
                                 const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
-                                // Filter out MobileNet features if webcam input (permanently hidden)
-                                const shouldHideEmbeddings = inputSource === 'webcam';
-                                const entries = Object.entries(incomingData).filter(([key]) => {
-                                    if (shouldHideEmbeddings && key.startsWith('f') && /^f\d+$/.test(key)) {
-                                        return false; // Hide f0, f1, ... f1023
+                                // Separate embeddings from other features
+                                const embeddingEntries = [];
+                                const regularEntries = [];
+
+                                Object.entries(incomingData).forEach(([key, val]) => {
+                                    if (inputSource === 'webcam' && key.startsWith('f') && /^f\d+$/.test(key)) {
+                                        embeddingEntries.push([key, val]);
+                                    } else {
+                                        regularEntries.push([key, val]);
                                     }
-                                    return true;
                                 });
 
-                                return entries.map(([key, val]) => {
-                                    const index = keys.indexOf(key);
-                                    const isActive = selectedFeatures?.has(key);
-                                    const color = index !== -1 ? colors[index % colors.length] : '#888';
+                                return (
+                                    <>
+                                        {/* Regular features */}
+                                        {regularEntries.map(([key, val]) => {
+                                            const index = keys.indexOf(key);
+                                            const isActive = selectedFeatures?.has(key);
+                                            const color = index !== -1 ? colors[index % colors.length] : '#888';
 
-                                    return (
-                                        <FeatureRow
-                                            key={key}
-                                            label={key}
-                                            value={val}
-                                            active={isActive}
-                                            color={color}
-                                            onClick={() => toggleFeature(key)}
-                                        />
-                                    );
-                                });
+                                            return (
+                                                <FeatureRow
+                                                    key={key}
+                                                    label={key}
+                                                    value={val}
+                                                    active={isActive}
+                                                    color={color}
+                                                    onClick={() => toggleFeature(key)}
+                                                />
+                                            );
+                                        })}
+
+                                        {/* Collapsible embeddings section */}
+                                        {embeddingEntries.length > 0 && (
+                                            <div className="pt-2">
+                                                <button
+                                                    onClick={() => setShowEmbeddings(!showEmbeddings)}
+                                                    className="w-full flex items-center justify-between p-2 rounded border border-zinc-800 hover:border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900 transition-all group"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <ChevronDown size={12} className={`text-zinc-500 transition-transform ${showEmbeddings ? 'rotate-0' : '-rotate-90'}`} />
+                                                        <span className="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-300">MobileNet Embeddings</span>
+                                                    </div>
+                                                    <span className="text-[9px] text-zinc-600 font-mono">{embeddingEntries.length} features</span>
+                                                </button>
+                                                {showEmbeddings && (
+                                                    <div className="mt-1 space-y-1 pl-4 border-l border-zinc-800">
+                                                        {embeddingEntries.map(([key, val]) => {
+                                                            const index = keys.indexOf(key);
+                                                            const isActive = selectedFeatures?.has(key);
+                                                            const color = index !== -1 ? colors[index % colors.length] : '#888';
+
+                                                            return (
+                                                                <FeatureRow
+                                                                    key={key}
+                                                                    label={key}
+                                                                    value={val}
+                                                                    active={isActive}
+                                                                    color={color}
+                                                                    onClick={() => toggleFeature(key)}
+                                                                />
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </>
+                                );
                             })()}
                             {Object.keys(incomingData || {}).length === 0 && (
                                 <div className="text-xs text-zinc-600 p-4 text-center italic">Waiting for Signal...</div>
