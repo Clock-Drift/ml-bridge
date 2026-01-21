@@ -128,13 +128,20 @@ ipcMain.handle('ws-broadcast', (event, channel, data) => {
             io.emit(channel, data);
         }
 
+        // Debug: Log when serial protocol is detected
+        console.log('[WS-BROADCAST] Channel:', channel, 'Protocol:', data.protocol, 'DeviceId:', data.deviceId);
+
         // If protocol is 'serial' and deviceId is provided, send to Serial Bridge
         if (data.protocol === 'serial' && data.deviceId) {
+            console.log('[WS-BROADCAST] Triggering Serial Bridge send to:', data.deviceId);
             sendToSerialBridge(data.deviceId, data);
+        } else {
+            console.log('[WS-BROADCAST] Not sending to Serial Bridge - protocol:', data.protocol, 'deviceId:', data.deviceId);
         }
 
         return { success: true };
     } catch (e) {
+        console.error('[WS-BROADCAST] Error:', e);
         return { success: false, error: e.message };
     }
 });
